@@ -104,6 +104,7 @@ Kill the other nodes you launched above, and start publishing a new image with p
 ```bash
 $ rosrun image_publisher image_publisher __name:=image_publisher ~/jetson-inference/data/images/peds-004.jpg 
 $ rosrun ros_deep_learning detectnet /detectnet/image_in:=/image_publisher/image_raw _model_name:=pednet
+$ rosrun ros_deep_learning detectnet /detectnet/image_in:=/image_publisher/image_raw _model_name:=multiped
 ```
 
 See [here](https://github.com/dusty-nv/jetson-inference#pretrained-detectnet-models-available) for the built-in detection models available.  Here's an example of launching with the model that detects dogs:
