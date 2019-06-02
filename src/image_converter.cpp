@@ -57,7 +57,8 @@ bool imageConverter::Convert( const sensor_msgs::ImageConstPtr& input )
 	ROS_INFO("converting %ux%u %s image", input->width, input->height, input->encoding.c_str());
 
 	// confirm bgr8 encoding
-	if( input->encoding != sensor_msgs::image_encodings::BGR8 )
+	if( input->encoding != sensor_msgs::image_encodings::BGR8 
+      && input->encoding != sensor_msgs::image_encodings::RGB8)
 	{
 		ROS_ERROR("%ux%u image is in %s format, expected %s", input->width, input->height, input->encoding.c_str(), sensor_msgs::image_encodings::BGR8.c_str());
 		return false;
@@ -80,7 +81,17 @@ bool imageConverter::Convert( const sensor_msgs::ImageConstPtr& input )
 	memcpy(mInputCPU, input->data.data(), input->width * input->height * sizeof(uchar3));	// note: 3 channels assumes bgr/rgb			
 	
 	// convert to RGBA32f format
-	if( CUDA_FAILED(cudaBGR8ToRGBA32((uchar3*)mInputGPU, (float4*)mOutputGPU, mWidth, mHeight)) )
+  bool convert_status = false;
+  if( input->encoding != sensor_msgs::image_encodings::BGR8 )
+  {
+    convert_status = CUDA_FAILED(cudaBGR8ToRGBA32((uchar3*)mInputGPU, (float4*)mOutputGPU, mWidth, mHeight));
+  }
+  else if( input->encoding != sensor_msgs::image_encodings::RGB8 )
+  {
+    convert_status = CUDA_FAILED(cudaRGB8ToRGBA32((uchar3*)mInputGPU, (float4*)mOutputGPU, mWidth, mHeight));
+  }
+
+	if( convert_status )
 	{
 		ROS_ERROR("failed to convert %ux%u image with CUDA", mWidth, mHeight);
 		return false;
