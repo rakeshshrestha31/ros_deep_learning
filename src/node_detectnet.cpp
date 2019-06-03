@@ -87,6 +87,7 @@ void img_callback( const sensor_msgs::ImageConstPtr& input )
 		
 		// create a detection for each bounding box
 		vision_msgs::Detection2DArray msg;
+    msg.header.stamp = input->header.stamp;
 
 		for( int n=0; n < numBoundingBoxes; n++ )
 		{
